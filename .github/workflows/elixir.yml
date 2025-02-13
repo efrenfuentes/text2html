@@ -51,6 +51,16 @@ jobs:
       - name: Install dependencies
         run: mix deps.get
 
+      # Step: Check that the checked in code has already been formatted.
+      # This step fails if something was found unformatted.
+      # Customize this step as desired.
+      - name: Check Formatting
+        run: mix format --check-formatted
+
+      # Step: Check for code warnings
+      - name: Check Code
+        run: mix credo --only warning
+
       # Step: Execute tests
       - name: Run tests
         run: mix test --trace --seed 0 --max-failures 1
