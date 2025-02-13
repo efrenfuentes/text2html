@@ -1,0 +1,56 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Elixir CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    strategy:
+      # Specify the OTP and Elixir versions to use when building
+      # and running the workflow steps.
+      matrix:
+        otp: ["27.1.2"] # Define the OTP version [required]
+        elixir: ["1.17.3"] # Define the elixir version [required]
+    env:
+      MIX_ENV: test
+
+    steps:
+      # Step: Setup Elixir + Erlang image as the base.
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: ${{matrix.elixir}} # [Required] Define the Elixir version
+          otp-version: ${{matrix.otp}} # [Required] Define the Erlang/OTP version
+
+      # Step: Check out the code.
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step: Restore and cache dependencies.
+      - name: Restore dependencies cache
+        uses: actions/cache@v4
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-mix-
+
+      # Step: Install dependencies
+      - name: Install dependencies
+        run: mix deps.get
+
+      # Step: Execute tests
+      - name: Run tests
+        run: mix test --trace --seed 0 --max-failures 1
