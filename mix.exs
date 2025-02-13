@@ -21,6 +21,8 @@ defmodule Text2Html.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:phoenix_html, "~> 2.11 or ~> 3.0 or ~> 4.0"},
+      {:phoenix_html_helpers, "~> 1.0"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
