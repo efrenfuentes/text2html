@@ -105,6 +105,44 @@ defmodule Text2HtmlTest do
            """
   end
 
+  test "set_links" do
+    formatted =
+      format(
+        """
+        You should try http://www.google.com
+        It's not secure.
+
+        You should try it.
+        """,
+        links: true,
+        links_opts: [only_secure: false, blank_target: false]
+      )
+
+    assert formatted == """
+           <p>You should try <a href="http://www.google.com">http://www.google.com</a><br>\nIt&#39;s not secure.</p>\n<p>You should try it.</p>
+           """
+  end
+
+  test "set_links only secure links with blank_target and class" do
+    formatted =
+      format(
+        """
+        You should try http://www.google.com
+        It's not secure.
+
+        But https://www.google.com is secure.
+
+        You should try it.
+        """,
+        links: true,
+        links_opts: [only_secure: true, blank_target: true, class: "text-blue-500"]
+      )
+
+    assert formatted == """
+           <p>You should try http://www.google.com<br>\nIt&#39;s not secure.</p>\n<p>But <a href="https://www.google.com" target=\"_blank\" class=\"text-blue-500\">https://www.google.com</a> is secure.</p>\n<p>You should try it.</p>
+           """
+  end
+
   defp format(text, opts \\ []) do
     text |> text_to_html(opts) |> Phoenix.HTML.safe_to_string()
   end
